@@ -19,4 +19,10 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="traffic_light1.json" />
+    <None Include="traffic_light2.json" />
+    <None Include="traffic_light3.json" />
+  </ItemGroup>
 </Project>

@@ -1,11 +1,15 @@
 ﻿#include <iostream>
+#include <fstream>
+#include <vector>
 #include <chrono>
 #include <thread>
 #include <cstdlib>
 #include <windows.h>
+#include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace std::chrono_literals;
+using json = nlohmann::json;
 
 enum TrafficLightsState
 {
@@ -82,6 +86,29 @@ public:
     }
 };
 
+Address ReadAddressFromFile(string fileName)
+{
+    ifstream file(fileName);
+
+    if (!file.is_open())
+    {
+        cout << "Не удалось открыть файл: " << fileName << endl;
+        return Address();
+    }
+
+    json data;
+    file >> data;
+
+    Address a;
+    a.country = data["country"];
+    a.city = data["city"];
+    a.street = data["street"];
+    a.latitude = data["latitude"];
+    a.longitude = data["longitude"];
+
+    return a;
+}
+
 int main()
 {
     system("chcp 65001 > nul");
@@ -91,18 +118,19 @@ int main()
     GetConsoleMode(console, &mode);
     SetConsoleMode(console, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
-    Address a;
-    a.country = "Россия";
-    a.city = "Москва";
-    a.street = "Фестивальная улица, д. 24А";
-    a.latitude = 55.8728;
-    a.longitude = 37.5409;
+    vector<TrafficLight> trafficLights;
 
-    TrafficLight trafficLight(a);
+    trafficLights.push_back(TrafficLight(ReadAddressFromFile("traffic_light1.json")));
+    trafficLights.push_back(TrafficLight(ReadAddressFromFile("traffic_light2.json")));
+    trafficLights.push_back(TrafficLight(ReadAddressFromFile("traffic_light3.json")));
 
     while (true)
     {
-        trafficLight.GetInfo();
+        for (int i = 0; i < trafficLights.size(); i++)
+        {
+            trafficLights[i].GetInfo();
+        }
+
         std::this_thread::sleep_for(23000ms);
     }
 
